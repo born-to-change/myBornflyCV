@@ -7,6 +7,7 @@ from __future__ import print_function
 
 import argparse
 import os
+os.environ["CUDA_VISIBLE_DEVICES"] = '0,1,2,3,4,5'
 import sys
 
 from moviepy.editor import VideoFileClip
@@ -32,7 +33,7 @@ def crop_center(im):
         return im[int((h - w) / 2):int((h - w) / 2) + w, 0:w, :]
 
 
-def extract_features(input_dir, output_dir, model_type='inceptionv3', batch_size=32):
+def extract_features(input_dir, output_dir, model_type='inceptionv3', batch_size=128):
     """
     Extracts features from a CNN trained on ImageNet classification from all
     videos in a directory.
@@ -120,11 +121,11 @@ def extract_features(input_dir, output_dir, model_type='inceptionv3', batch_size
             sys.stderr.write("Unable to read '%s'. Skipping...\n" % video_filename)
             sys.stderr.write("Exception: {}\n".format(e))
             continue
-
+        shape = (224, 224)
         # Sample frames at 1fps
         fps = int(np.round(clip.fps))
-        frames = [scipy.misc.imresize(crop_center(x.astype(np.float32)), shape)
-                  for idx, x in enumerate(clip.iter_frames()) if idx % fps == fps // 2]
+        frames = [scipy.misc.imresize(x.astype(np.float32), shape)
+                  for idx, x in enumerate(clip.iter_frames())]                     #if idx % fps == fps // 2
 
         n_frames = len(frames)
 
@@ -160,9 +161,17 @@ if __name__ == '__main__':
 
     extract_features(input_dir=args.input, output_dir=args.output,
                      model_type=args.model, batch_size=args.batch_size)
+    # input = "/disk2/lzq/test"
+    # output = "/disk2/lzq/feature/test"
+    #
+    # comm = 'python extract_features.py -i {0} -o {1} -m {2} '.format(input, output, "vgg19")
+    # os.system(comm)
 
 
     #   -i /Users/user/Desktop/openSourcePrj/imgResource/PETS.avi -o /Users/user/Desktop/openSourcePrj/imgResource/video_features -m vgg19
+    # python extract_features.py -i /disk2/lzq/test -o /disk2/lzq/features/test -m vgg19 -b 128
     #
+    # -i /disk2/lzq/BreakfastII_15fps_qvga_sync/P03/cam01 -o /disk2/lzq/features/breakfest_my -m resnet50
+
 
 

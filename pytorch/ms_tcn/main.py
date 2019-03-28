@@ -4,11 +4,14 @@ import torch
 from model import Trainer
 from batch_gen import BatchGenerator
 import os
+os.environ["CUDA_VISIBLE_DEVICES"] = '0,1,2,3,4'
 import argparse
 import random
 
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#  python main.py --action=train --dataset=DS --split=SP
+
+device = torch.device("cuda")
 seed = 1538574472
 random.seed(seed)
 torch.manual_seed(seed)
@@ -37,15 +40,15 @@ sample_rate = 1
 if args.dataset == "50salads":
     sample_rate = 2
 
-vid_list_file = "./data/"+args.dataset+"/splits/train.split"+args.split+".bundle"
-vid_list_file_tst = "./data/"+args.dataset+"/splits/test.split"+args.split+".bundle"
-features_path = "./data/"+args.dataset+"/features/"
-gt_path = "./data/"+args.dataset+"/groundTruth/"
+vid_list_file = "/disk2/lzq/data/"+args.dataset+"/splits/train.split"+args.split+".bundle"
+vid_list_file_tst = "/disk2/lzq/data/"+args.dataset+"/splits/test.split"+args.split+".bundle"
+features_path = "/disk2/lzq/data/"+args.dataset+"/features/"
+gt_path = "/disk2/lzq/data/"+args.dataset+"/groundTruth/"
 
-mapping_file = "./data/"+args.dataset+"/mapping.txt"
+mapping_file = "/disk2/lzq/data/"+args.dataset+"/mapping.txt"
 
-model_dir = "./models/"+args.dataset+"/split_"+args.split
-results_dir = "./results/"+args.dataset+"/split_"+args.split
+model_dir = "/disk2/lzq/models/"+args.dataset+"/split_"+args.split
+results_dir = "/disk2/lzq/results/"+args.dataset+"/split_"+args.split
  
 if not os.path.exists(model_dir):
     os.makedirs(model_dir)
