@@ -5,8 +5,8 @@ import numpy as np
 import random
 
 
-class BatchGenerator(object):
-    def __init__(self, num_classes, actions_dict, gt_path, features_path, sample_rate):
+class BatchGenerator(object,):
+    def __init__(self, num_classes,batch_size, actions_dict, gt_path, features_path, sample_rate):
         self.list_of_examples = list()
         self.index = 0
         self.num_classes = num_classes
@@ -14,13 +14,14 @@ class BatchGenerator(object):
         self.gt_path = gt_path
         self.features_path = features_path
         self.sample_rate = sample_rate
+        self.batch_size = batch_size
 
     def reset(self):
         self.index = 0
         random.shuffle(self.list_of_examples)
 
     def has_next(self):
-        if self.index < len(self.list_of_examples):
+        if (len(self.list_of_examples)-self.index) > self.batch_size:
             return True
         return False
 

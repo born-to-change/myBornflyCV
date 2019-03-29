@@ -4,14 +4,12 @@ import torch
 from model import Trainer
 from batch_gen import BatchGenerator
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = '0,1,2,3,4'
+os.environ["CUDA_VISIBLE_DEVICES"] = '1,2'
 import argparse
 import random
 
 
-#  python main.py --action=train --dataset=DS --split=SP
-
-device = torch.device("cuda")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 seed = 1538574472
 random.seed(seed)
 torch.manual_seed(seed)
@@ -29,7 +27,7 @@ num_stages = 4
 num_layers = 10
 num_f_maps = 64
 features_dim = 2048
-bz = 1
+bz = 8
 lr = 0.0005
 num_epochs = 50
 
@@ -66,7 +64,7 @@ num_classes = len(actions_dict)
 
 trainer = Trainer(num_stages, num_layers, num_f_maps, features_dim, num_classes)
 if args.action == "train":
-    batch_gen = BatchGenerator(num_classes, actions_dict, gt_path, features_path, sample_rate)
+    batch_gen = BatchGenerator(num_classes, bz, actions_dict, gt_path, features_path, sample_rate)
     batch_gen.read_data(vid_list_file)
     trainer.train(model_dir, batch_gen, num_epochs=num_epochs, batch_size=bz, learning_rate=lr, device=device)
 
