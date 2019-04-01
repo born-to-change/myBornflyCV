@@ -7,7 +7,7 @@ from __future__ import print_function
 
 import argparse
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = '0,1,2,3,4,5'
+os.environ["CUDA_VISIBLE_DEVICES"] = '0,2,3,4,6,7'
 import sys
 
 from moviepy.editor import VideoFileClip
@@ -88,7 +88,7 @@ def extract_features(input_dir, output_dir, model_type='inceptionv3', batch_size
 
     # Create output directories
 
-    visual_dir = os.path.join(output_dir, 'visual')  # RGB features
+    visual_dir = os.path.join(output_dir, 'features')  # RGB features
     # motion_dir = os.path.join(output_dir, 'motion') # Spatiotemporal features
     # opflow_dir = os.path.join(output_dir, 'opflow') # Optical flow features
 
@@ -124,7 +124,7 @@ def extract_features(input_dir, output_dir, model_type='inceptionv3', batch_size
         shape = (224, 224)
         # Sample frames at 1fps
         fps = int(np.round(clip.fps))
-        frames = [scipy.misc.imresize(x.astype(np.float32), shape)
+        frames = [scipy.misc.imresize(crop_center(x).astype(np.float32), shape)
                   for idx, x in enumerate(clip.iter_frames())]                     #if idx % fps == fps // 2
 
         n_frames = len(frames)
@@ -141,7 +141,7 @@ def extract_features(input_dir, output_dir, model_type='inceptionv3', batch_size
         feat_filepath = os.path.join(visual_dir, name + '.npy')
 
         with open(feat_filepath, 'wb') as f:
-            np.save(f, features)
+            np.save(f, features.transpose())
 
 
 if __name__ == '__main__':

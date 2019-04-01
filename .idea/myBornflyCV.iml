@@ -12,7 +12,7 @@
       <sourceFolder url="file://$MODULE_DIR$/keras/learn_sklearn" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/transfer" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 2.7 (venv2) (1)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 2.7 (pytorch1.0)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TestRunnerService">

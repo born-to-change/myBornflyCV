@@ -4,7 +4,7 @@ import torch
 from model import Trainer
 from batch_gen import BatchGenerator
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = '1,2'
+os.environ["CUDA_VISIBLE_DEVICES"] = '0,2'
 import argparse
 import random
 
@@ -38,8 +38,11 @@ sample_rate = 1
 if args.dataset == "50salads":
     sample_rate = 2
 
-vid_list_file = "/disk2/lzq/data/"+args.dataset+"/splits/train.split"+args.split+".bundle"
-vid_list_file_tst = "/disk2/lzq/data/"+args.dataset+"/splits/test.split"+args.split+".bundle"
+# vid_list_file = "/disk2/lzq/data/"+args.dataset+"/splits/train.split"+args.split+".bundle"
+# vid_list_file_tst = "/disk2/lzq/data/"+args.dataset+"/splits/test.split"+args.split+".bundle"
+
+vid_list_file = "/disk2/lzq/data/"+args.dataset+"/splits/train.txt"
+vid_list_file_tst = "/disk2/lzq/data/"+args.dataset+"/splits/test.txt"
 features_path = "/disk2/lzq/data/"+args.dataset+"/features/"
 gt_path = "/disk2/lzq/data/"+args.dataset+"/groundTruth/"
 
