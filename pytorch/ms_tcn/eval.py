@@ -98,9 +98,9 @@ def main():
 
     args = parser.parse_args()
 
-    ground_truth_path = "./data/"+args.dataset+"/groundTruth/"
-    recog_path = "./results/"+args.dataset+"/split_"+args.split+"/"
-    file_list = "./data/"+args.dataset+"/splits/test.split"+args.split+".bundle"
+    ground_truth_path = "/disk2/lzq/data/"+args.dataset+"/groundTruth/"
+    recog_path = "/disk2/lzq/results/"+args.dataset+"/split_"+args.split+"/"
+    file_list = "/disk2/lzq/data/"+args.dataset+"/splits/test.txt"
 
     list_of_videos = read_file(file_list).split('\n')[:-1]
 
