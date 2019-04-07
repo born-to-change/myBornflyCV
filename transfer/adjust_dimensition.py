@@ -8,3 +8,4 @@ print(data_dict.shape)
 #     print(x)
 #     with open('/disk2/lzq/data/MERL/groundTruth/'+x, 'a') as f:
 #         f.write('background')
+
