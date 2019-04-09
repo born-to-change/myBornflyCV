@@ -7,7 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/keras/learnKeras" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/keras/tcn" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/pytorch/ms_tcn" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/pytorch/TCN" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/pytorch/myTCN" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/keras/data" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/keras/learn_sklearn" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/transfer" isTestSource="false" />

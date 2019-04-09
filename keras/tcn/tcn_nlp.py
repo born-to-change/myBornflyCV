@@ -12,7 +12,7 @@ from keras.models import Input, Model
 
 def residual_block(x, dilation_rate, nb_filters, kernel_size, padding, dropout_rate=0):
     # type: (Layer, int, int, int, str, float) -> Tuple[Layer, Layer]
-    """Defines the residual block for the WaveNet TCN
+    """Defines the residual block for the WaveNet myTCN
 
     Args:
         x: The previous layer in the model
@@ -57,7 +57,7 @@ def process_dilations(dilations):
 
 
 class TCN:
-    """Creates a TCN layer.
+    """Creates a myTCN layer.
 
         Input shape:
             A tensor of shape (batch_size, timesteps, input_dim).
@@ -71,10 +71,10 @@ class TCN:
             use_skip_connections: Boolean. If we want to add skip connections from input to each residual block.
             return_sequences: Boolean. Whether to return the last output in the output sequence, or the full sequence.
             dropout_rate: Float between 0 and 1. Fraction of the input units to drop.
-            name: Name of the model. Useful when having multiple TCN.
+            name: Name of the model. Useful when having multiple myTCN.
 
         Returns:
-            A TCN layer.
+            A myTCN layer.
         """
 
     def __init__(self,
@@ -102,8 +102,8 @@ class TCN:
 
         if not isinstance(nb_filters, int):
             print('An interface change occurred after the version 2.1.2.')
-            print('Before: tcn.TCN(x, return_sequences=False, ...)')
-            print('Now should be: tcn.TCN(return_sequences=False, ...)(x)')
+            print('Before: tcn.myTCN(x, return_sequences=False, ...)')
+            print('Now should be: tcn.myTCN(return_sequences=False, ...)(x)')
             print('The alternative is to downgrade to 2.1.2 (pip install keras-tcn==2.1.2).')
             raise Exception()
 
@@ -144,7 +144,7 @@ def compiled_tcn(num_feat,  # type: int
                  opt='adam',
                  lr=0.002):
     # type: (...) -> keras.Model
-    """Creates a compiled TCN model for a given task (i.e. regression or classification).
+    """Creates a compiled myTCN model for a given task (i.e. regression or classification).
 
     Args:
         num_feat: The number of features of your input, i.e. the last dimension of: (batch_size, timesteps, input_dim).
@@ -159,11 +159,11 @@ def compiled_tcn(num_feat,  # type: int
         return_sequences: Boolean. Whether to return the last output in the output sequence, or the full sequence.
         regression: Whether the output should be continuous or discrete.
         dropout_rate: Float between 0 and 1. Fraction of the input units to drop.
-        name: Name of the model. Useful when having multiple TCN.
+        name: Name of the model. Useful when having multiple myTCN.
         opt: Optimizer name.
         lr: Learning rate.
     Returns:
-        A compiled keras TCN.
+        A compiled keras myTCN.
     """
 
     dilations = process_dilations(dilations)

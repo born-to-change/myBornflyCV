@@ -156,7 +156,7 @@ if 0: # ECCV or ICRA receptive field
 	plt.title("Performance on {}".format(dataset), fontsize=16)
 	plt.legend(loc=4, fontsize=14)
 
-if 0: # ED-TCN receptive field
+if 0: # ED-myTCN receptive field
 	ds = np.array([int(k.split("conv")[-1]) for k in f1_scores])
 	Ls = np.array([int(k.split("relu_")[-1].split("_")[0]) for k in f1_scores])
 	f1s = np.array(list(f1_scores.values()))
@@ -172,10 +172,10 @@ if 0: # ED-TCN receptive field
 	plt.ylabel("F1@25 Score", fontsize=18)
 	plt.xticks(fontsize=16)
 	plt.yticks(fontsize=16)
-	plt.title("ED-TCN", fontsize=20, fontstyle="normal")
+	plt.title("ED-myTCN", fontsize=20, fontstyle="normal")
 	plt.legend()
 
-if 0: # Dilated TCN receptive field
+if 0: # Dilated myTCN receptive field
 	Bs = np.array([int(k[-1]) for k in f1_scores])
 	Ls = np.array([int(k.split("_")[5][1]) for k in f1_scores])
 	f1s = np.array(list(f1_scores.values()))
@@ -190,7 +190,7 @@ if 0: # Dilated TCN receptive field
 	plt.ylabel("F1@25 Score", fontsize=18)
 	plt.xticks(fontsize=16)
 	plt.yticks(fontsize=16)
-	plt.title("Dilated TCN", fontsize=20, fontstyle="normal")
+	plt.title("Dilated myTCN", fontsize=20, fontstyle="normal")
 	plt.legend()
 
 
@@ -246,7 +246,7 @@ if 0:
 			if "ICRA" in t:
 				plt.ylabel("ICRA", fontsize=16)
 			else:
-				plt.ylabel("ED\nTCN", fontsize=16)
+				plt.ylabel("ED\nmyTCN", fontsize=16)
 
 
 
@@ -346,10 +346,10 @@ if 0:
 			plt.xticks([])
 		# print(np.mean(p==y0))
 		plt.ylabel("{:.04}".format(acc*100), fontsize=18)
-		if "TCN" in t:
-			plt.ylabel("ED-TCN", fontsize=18)
+		if "myTCN" in t:
+			plt.ylabel("ED-myTCN", fontsize=18)
 		elif "wavenet" in t:
-			plt.ylabel("D-TCN", fontsize=18)
+			plt.ylabel("D-myTCN", fontsize=18)
 		elif "dense" in t:
 			plt.ylabel("Dense", fontsize=18)
 		elif "sparse" in t:
@@ -389,9 +389,9 @@ if 0:
 			# print(np.mean(p==y0))
 			plt.ylabel("{:.04}".format(acc*100), fontsize=18)
 			if "norm_relu_" in t:
-				plt.ylabel("ED-TCN", fontsize=18)
+				plt.ylabel("ED-myTCN", fontsize=18)
 			elif "wavenet" in t:
-				plt.ylabel("D-TCN", fontsize=18)
+				plt.ylabel("D-myTCN", fontsize=18)
 			elif "ECCV" in t:
 				plt.ylabel("ST-CNN", fontsize=18)
 			elif "SVM" in t:

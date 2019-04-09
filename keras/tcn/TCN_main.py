@@ -36,7 +36,7 @@ from sklearn.svm import LinearSVC
 
 from keras.utils import np_utils
 
-# TCN imports 
+# myTCN imports
 import tf_models, datasets, utils, metrics
 from utils import imshow_
 
@@ -55,7 +55,7 @@ granularity = ["eval", "mid"][1]
 sensor_type = ["video", "sensors"][0]
 
 # Set model and parameters
-model_type = ["SVM", "LSTM", "LC-SC-CRF", "tCNN",  "DilatedTCN", "ED-TCN", "TDNN"][0]
+model_type = ["SVM", "LSTM", "LC-SC-CRF", "tCNN",  "DilatedTCN", "ED-myTCN", "TDNN"][0]
 # causal or acausal? (If acausal use Bidirectional LSTM)
 causal = [False, True][0]
 
@@ -116,7 +116,7 @@ if 1:
             param_str = "SVM"
 
         # --------- CVPR model ----------
-        elif model_type in ["tCNN", "ED-TCN", "DilatedTCN", "TDNN", "LSTM"]:
+        elif model_type in ["tCNN", "ED-myTCN", "DilatedTCN", "TDNN", "LSTM"]:
             # Go from y_t = {1...C} to one-hot vector (e.g. y_t = [0, 0, 1, 0])
             Y_train = [np_utils.to_categorical(y, n_classes) for y in y_train]
             Y_test = [np_utils.to_categorical(y, n_classes) for y in y_test]
@@ -134,7 +134,7 @@ if 1:
             if model_type == "tCNN":
                 model, param_str = tf_models.temporal_convs_linear(n_nodes[0], conv, n_classes, n_feat, 
                                                     max_len, causal=causal, return_param_str=True)
-            elif model_type == "ED-TCN":
+            elif model_type == "ED-myTCN":
                 model, param_str = tf_models.ED_TCN(n_nodes, conv, n_classes, n_feat, max_len, causal=causal, 
                                         activation='norm_relu', return_param_str=True) 
                 # model, param_str = tf_models.ED_TCN_atrous(n_nodes, conv, n_classes, n_feat, max_len, 
@@ -238,7 +238,7 @@ if 1:
                 # plt.title("Acc: {:.03}%".format(100*np.mean(P_test[i]==y_test[i])))
 
         # ---- Viz weights -----
-        if viz_weights and model_type is "TCN":
+        if viz_weights and model_type is "myTCN":
             # Output weights at the first layer
             plt.figure(2, figsize=(15,15))
             ws = model.get_weights()[0]
