@@ -9,24 +9,28 @@ import numpy as np
 
 
 class MultiStageModel(nn.Module):
+    # num_stages = 4  num_layers = 10  num_f_maps = 64  4个stage，一个模块10层，没层都是64个filter
     def __init__(self, num_stages, num_layers, num_f_maps, dim, num_classes):
         super(MultiStageModel, self).__init__()
         self.stage1 = SingleStageModel(num_layers, num_f_maps, dim, num_classes)
         self.stages = nn.ModuleList([copy.deepcopy(SingleStageModel(num_layers, num_f_maps, num_classes, num_classes)) for s in range(num_stages-1)])
+        #   copy.deepcopy 深拷贝 拷贝对象及其子对象
 
     def forward(self, x):
         out = self.stage1(x)
-        outputs = out.unsqueeze(0)
+        outputs = out.unsqueeze(0)   # (1,bz,C_out,L_out)
         for s in self.stages:
-            out = s(F.softmax(out, dim=1))
+            out = s(F.softmax(out, dim=1))  # （ bz,C_out,L_out） dim是要计算的维度
             outputs = torch.cat((outputs, out.unsqueeze(0)), dim=0)
+            #  将每个stage的output做并列拼接
+            #  最后维度（4,bz,num_classes,max）
         return outputs
 
 
 class SingleStageModel(nn.Module):
     def __init__(self, num_layers, num_f_maps, dim, num_classes):
         super(SingleStageModel, self).__init__()
-        self.conv_1x1 = nn.Conv1d(dim, num_f_maps, 1)
+        self.conv_1x1 = nn.Conv1d(dim, num_f_maps, 1)  # kernel_size = 1 用1x1conv 降维，从2048降到64
         self.layers = nn.ModuleList([copy.deepcopy(DilatedResidualLayer(2 ** i, num_f_maps, num_f_maps)) for i in range(num_layers)])
         self.conv_out = nn.Conv1d(num_f_maps, num_classes, 1)
 
@@ -42,13 +46,15 @@ class DilatedResidualLayer(nn.Module):
     def __init__(self, dilation, in_channels, out_channels):
         super(DilatedResidualLayer, self).__init__()
         self.conv_dilated = nn.Conv1d(in_channels, out_channels, 3, padding=dilation, dilation=dilation)
+        # 一维卷积层，输入的尺度是(N, C_in,L)，输出尺度（ N,C_out,L_out）  加padding后 L_out= L
+        #  kernel_size=3 dilation=2 ** i 随层数指数递增 1~512, 感受野计算：lk = l(k-1) + 2*dilation, 最后一层每个filter的感受野2047
         self.conv_1x1 = nn.Conv1d(out_channels, out_channels, 1)
         self.dropout = nn.Dropout()
 
     def forward(self, x):
         out = F.relu(self.conv_dilated(x))
         out = self.conv_1x1(out)
-        out = self.dropout(out)
+        out = self.dropout(out)    # 尝试 x+out后再加bn和relu
         return x + out
 
 
@@ -67,16 +73,34 @@ class Trainer:
             epoch_loss = 0
             correct = 0
             total = 0
+
             while batch_gen.has_next():
+                #  batch_input_tensor:（bz, 2048, max), batch_target_tensor: (bz, max), mask: (bz, num_class, max)
                 batch_input, batch_target, mask = batch_gen.next_batch(batch_size)
                 batch_input, batch_target, mask = batch_input.to(device), batch_target.to(device), mask.to(device)
                 optimizer.zero_grad()
-                predictions = self.model(batch_input)
+                predictions = self.model(batch_input)   # predictions最后一层的输出维度(4,bz,num_classes,max)
 
                 loss = 0
                 for p in predictions:
+                    #  target:将样本和标签转换数据维度，分别转成二维和一维，最后一维都是类别数
+                    #  p.transpose(2, 1)交换维度 （bz,max,num_classes）
+                    #  contiguous:返回一个内存连续的有相同数据的tensor，如果原tensor内存连续则返回原tensor
+                    #  view():返回一个有相同数据但大小不同的tensor view(-1, self.num_classes)：将转成（bz*max, num_classes）
+                    #  batch_target.view(-1):转成(bz*max)
+                    #  nn.CrossEntropyLoss(ignore_index=-100):   Target: (N) N是mini-batch的大小，0 <= targets[i] <= C-1
+                    #  loss(x,class)=−logexp(x[class])∑jexp(x[j])) =−x[class]+log(∑jexp(x[j]))  Input: (N,C) C 是类别的数量
+
+
+
                     loss += self.ce(p.transpose(2, 1).contiguous().view(-1, self.num_classes), batch_target.view(-1))
-                    loss += 0.15*torch.mean(torch.clamp(self.mse(F.log_softmax(p[:, :, 1:], dim=1), F.log_softmax(p.detach()[:, :, :-1], dim=1)), min=0, max=16)*mask[:, :, 1:])
+                    #  torch.clamp(input, min, max, out=None) → Tensor将输入input张量每个元素的夹紧到区间 [min,max]
+                    #  nn.MSELoss(reduction='none')  F.log_softmax(p[:, :, 1:], dim=1):对所有类别求log(softmax)
+                    #  dim类别维度 (int): A dimension along which log_softmax will be computed.
+                    #  detach():返回一个新的 从当前图中分离的 Variable,被detach 的Variable 指向同一个tensor
+                    #  对p中的向量，分别从max维度的：1~max帧和从0~max-1帧划分，错位做均方误差  x，y维度:(bz,max-1)
+                    loss += 0.15*torch.mean(torch.clamp(self.mse(F.log_softmax(p[:, :, 1:], dim=1),
+                                         F.log_softmax(p.detach()[:, :, :-1], dim=1)), min=0, max=16)*mask[:, :, 1:])
 
                 epoch_loss += loss.item()
                 loss.backward()
