@@ -5,22 +5,11 @@ from moviepy.editor import VideoFileClip
 import numpy as np
 import cv2
 from tqdm import tqdm
+import multiprocessing
 
 def is_video(x):
     return x.endswith('.mp4') or x.endswith('.avi') or x.endswith('.mov')
 
-'''
-Convert a video to frame images, can handle videos_dir(if they have muti video_dir,only can invoke separately) 
-or video file and transform frames arganized by filename 
-
-        Args:
-           input_path: input video file dir
-           output_path: output frames dir
-           fps=None: if you want Use frame skipping，assign your own fps(<= video_fps)
-           isCrop=False: crop the image 
-
-
-'''
 def video2imgage(input_path, output_path, fps=None, isCrop=False):
 
     if not os.path.isdir(input_path):
@@ -70,6 +59,7 @@ def video2imgage(input_path, output_path, fps=None, isCrop=False):
                         cv2.imwrite(output_file_path + '/' + str(idx + 1) + '.jpg', x)
 
     else:
+        pool = multiprocessing.Pool(processes=16)
         for video_file in video_filenames:
             output_file_path = output_path + '/' + video_file.split('.')[0]
             if os.path.exists(output_file_path):
@@ -77,12 +67,16 @@ def video2imgage(input_path, output_path, fps=None, isCrop=False):
             else:
                 os.makedirs(output_file_path)
 
-            video = mmcv.VideoReader(os.path.join(input_path, video_file))
-            video.cvt2frames(output_file_path)
+            pool.apply_async(apply_cv, (input_path, video_file, output_file_path,))
+        pool.close()
+        pool.join()
 
 
+def apply_cv(input_path, video_file, output_file_path):
+    video = mmcv.VideoReader(os.path.join(input_path, video_file))
+    video.cvt2frames(output_file_path)
 
 
     # Go through each video and extract features
 
-video2imgage('/Users/user/Desktop/dataSet/video', '/Users/user/Desktop/dataSet/frame')
+video2imgage('/disk2/lzq/charades/Charades_v1_480', '/disk2/lzq/charades/Charades_v1_rgb')

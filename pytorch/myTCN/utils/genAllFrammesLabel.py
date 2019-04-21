@@ -3,6 +3,9 @@ import cv2
 import os
 import numpy as np
 import mmcv
+import json
+import csv
+
 
 # 0 background
 # 1 reach_to_shelf
@@ -20,7 +23,7 @@ import mmcv
 #             '3': 'hand_in_shelf',
 #             '4': 'inspect_product',
 #             '5': 'inspect_shelf'}
-def gen_all_frames_label(video_dir, label_dir, output_dir, map_dict):
+def gen_merl_frames_label(video_dir, label_dir, output_dir, map_dict):
     for video in os.listdir(video_dir):
         video_path = video_dir + '/' + video
 
@@ -54,6 +57,4 @@ def gen_all_frames_label(video_dir, label_dir, output_dir, map_dict):
             f.close()
 
     return output_dir
-
-
 
